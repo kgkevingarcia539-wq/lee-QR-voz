@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner Inteligente con Voz</title>
+    <!-- Cerebro que analiza la cámara cuadro por cuadro -->
+    <script src="https://unpkg.com" type="text/javascript"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: radial-gradient(circle at center, #1e1b4b, #09090b); 
+            color: #f4f4f5; 
+            text-align: center; 
+            margin: 0;
+            padding: 40px 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(12px);
+            padding: 35px 25px; 
+            border-radius: 24px; 
+            max-width: 480px; 
+            width: 90%; 
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        h1 { 
+            color: #f59e0b; 
+            font-size: 2.2rem;
+            margin: 0 0 10px 0; 
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+            font-weight: 800;
+        }
+
+        p { 
+            color: #94a3b8; 
+            font-size: 15px; 
+            margin-bottom: 30px; 
+        }
+
+        #lector-camara { 
+            width: 100%; 
+            max-width: 320px; 
+            margin: 0 auto; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            background: #020617; 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+            border: 2px dashed rgba(245, 158, 11, 0.4);
+        }
+
+        .resultado-box { margin-top: 30px; text-align: left; }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #34d399; 
+            font-weight: 600; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea { 
+            width: 100%; 
+            height: 110px; 
+            padding: 15px; 
+            background: rgba(2, 6, 23, 0.8); 
+            color: #34d399; 
+            border: 1px solid rgba(52, 211, 153, 0.3); 
+            border-radius: 12px; 
+            font-size: 16px; 
+            resize: none; 
+            box-sizing: border-box;
+        }
+
+        button { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: #020617; 
+            font-weight: 700; 
+            border: none; 
+            padding: 16px 28px; 
+            border-radius: 14px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            font-size: 16px; 
+            width: 100%; 
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        button:hover { 
+            background: linear-gradient(135deg, #fbbf24, #f59e0b); 
+            transform: translateY(-2px);
+        }
+
+        .link-fabrica {
+            display: inline-block;
+            margin-top: 25px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .link-fabrica:hover { color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Escáner con Voz 🤖🔊</h1>
+        <p>Usa la cámara para leer las instrucciones ocultas de cualquier código QR.</p>
+        
+        <button onclick="encenderCamara()">📷 ENCIENDE LA CÁMARA</button>
+
+        <div id="lector-camara"></div>
+
+        <div class="resultado-box">
+            <label for="textoPegado">⚡ Instrucciones Extraídas:</label>
+            <textarea id="textoPegado" placeholder="Esperando que apuntes a un QR..." readonly></textarea>
+        </div>
+
+        <a href="index.html" class="link-fabrica">🛠️ Volver a la Fábrica de QR</a>
+    </div>
+
+    <script>
+        let html5QrcodeScanner;
+
+        function encenderCamara() {
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "lector-camara", 
+                { fps: 15, qrbox: { width: 220, height: 220 } },
+                false
+            );
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+
+        function onScanSuccess(textoDecodificado) {
+            document.getElementById('textoPegado').value = textoDecodificado;
+            html5QrcodeScanner.clear().catch(err => console.error(err));
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const discurso = new SpeechSynthesisUtterance(textoDecodificado);
+                discurso.lang = 'es-MX'; // Voz en español latino
+                window.speechSynthesis.speak(discurso);
+            }
+        }
+    </script>
+</body>
+</html>
