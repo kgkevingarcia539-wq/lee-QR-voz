@@ -4,74 +4,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Escáner Inteligente con Voz</title>
-    <!-- Cargamos el cerebro que procesa los cuadros de la cámara desde internet -->
+    <!-- Cerebro de la cámara -->
     <script src="https://unpkg.com" type="text/javascript"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; text-align: center; margin-top: 40px; }
-        .container { background: #1e293b; padding: 25px; border-radius: 12px; display: inline-block; max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #334155; }
-        h1 { color: #f59e0b; margin-bottom: 10px; }
-        p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
-        #lector-camara { width: 100%; max-width: 320px; margin: 0 auto; border-radius: 8px; overflow: hidden; background: #0f172a; }
-        .resultado-box { margin-top: 25px; }
-        label { display: block; text-align: left; margin-bottom: 5px; color: #34d399; font-weight: bold; }
-        textarea { width: 90%; height: 120px; padding: 12px; background: #0f172a; color: #34d399; border: 2px solid #475569; border-radius: 6px; font-size: 16px; resize: none; font-family: sans-serif; }
-        button { background: #f59e0b; color: #0f172a; font-weight: bold; border: none; padding: 14px 24px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-size: 16px; width: 95%; transition: 0.2s; }
-        button:hover { background: #fbbf24; transform: scale(1.02); }
+        /* Estilos generales futuristas */
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: radial-gradient(circle at center, #1e1b4b, #09090b); 
+            color: #f4f4f5; 
+            text-align: center; 
+            margin: 0;
+            padding: 40px 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Contenedor principal con efecto de cristal y brillo neón */
+        .container { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(12px);
+            padding: 35px 25px; 
+            border-radius: 24px; 
+            max-width: 480px; 
+            width: 90%; 
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        h1 { 
+            color: #f59e0b; 
+            font-size: 2.2rem;
+            margin: 0 0 10px 0; 
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        p { 
+            color: #94a3b8; 
+            font-size: 15px; 
+            margin-bottom: 30px; 
+            line-height: 1.5;
+        }
+
+        /* Área de la cámara optimizada */
+        #lector-camara { 
+            width: 100%; 
+            max-width: 320px; 
+            margin: 0 auto; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            background: #020617; 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+            border: 2px dashed rgba(245, 158, 11, 0.4);
+            position: relative;
+        }
+
+        /* Cuadro de resultados inteligente */
+        .resultado-box { 
+            margin-top: 30px; 
+            text-align: left;
+        }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #34d399; 
+            font-weight: 600; 
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+        }
+
+        /* Caja de texto estilo consola hacker */
+        textarea { 
+            width: 100%; 
+            height: 110px; 
+            padding: 15px; 
+            background: rgba(2, 6, 23, 0.8); 
+            color: #34d399; 
+            border: 1px solid rgba(52, 211, 153, 0.3); 
+            border-radius: 12px; 
+            font-size: 16px; 
+            resize: none; 
+            font-family: 'Fira Code', monospace;
+            box-sizing: border-box;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #34d399;
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.2);
+        }
+
+        /* Botón de activación con pulso de energía */
+        button { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: #020617; 
+            font-weight: 700; 
+            border: none; 
+            padding: 16px 28px; 
+            border-radius: 14px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            font-size: 16px; 
+            width: 100%; 
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button:hover { 
+            background: linear-gradient(135deg, #fbbf24, #f59e0b); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Enlace interactivo inferior */
+        .link-fabrica {
+            display: inline-block;
+            margin-top: 25px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .link-fabrica:hover {
+            color: #f59e0b;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Escáner con Voz 🤖🔊</h1>
-        <p>Apunta a las instrucciones de cualquier código QR para que la web las lea por ti automáticamente.</p>
+        <h1>Lee QR Voz 🤖🔊</h1>
+        <p>Apunta a las instrucciones de cualquier código QR y la inteligencia artificial las leerá por ti de inmediato.</p>
         
-        <button onclick="encenderCamara()">📷 Activar Cámara LECTORA</button>
+        <button onclick="encenderCamara()">📷 ACTIVAR ESCÁNER</button>
 
-        <!-- Aquí se abrirá el video de tu cámara -->
+        <!-- Cuadro de la cámara -->
         <div id="lector-camara"></div>
 
         <div class="resultado-box">
-            <label for="textoPegado">Instrucciones extraídas (Pegado automático):</label>
-            <textarea id="textoPegado" placeholder="Esperando que escanees un código QR..." readonly></textarea>
+            <label for="textoPegado">⚡ Transcripción en Tiempo Real:</label>
+            <textarea id="textoPegado" placeholder="Consola lista. Esperando instrucciones de la matriz QR..." readonly></textarea>
         </div>
+
+        <a href="escaner.html" class="link-fabrica">🛠️ Ir a la Fábrica de QR</a>
     </div>
 
     <script>
         let html5QrcodeScanner;
 
         function encenderCamara() {
-            // Inicializamos el lector dentro del cuadro de nuestra pantalla
+            // Cambiar dinámicamente el estilo del contenedor al activar
+            document.querySelector('.container').style.borderColor = '#34d399';
+            document.querySelector('.container').style.boxShadow = '0 0 40px rgba(52, 211, 153, 0.15)';
+
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "lector-camara", 
-                { fps: 10, qrbox: { width: 250, height: 250 } },
+                { fps: 15, qrbox: { width: 220, height: 220 } },
                 false
             );
-            // Iniciamos la cámara y esperamos a que detecte un QR exitosamente
             html5QrcodeScanner.render(onScanSuccess);
         }
 
-        // ESTA FUNCIÓN SE EJECUTA SOLA CUANDO LA CÁMARA VE UN QR
         function onScanSuccess(textoDecodificado) {
-            // 1. Escribimos las instrucciones automáticamente en la caja verde
             document.getElementById('textoPegado').value = textoDecodificado;
             
-            // 2. Apagamos la cámara de inmediato para ahorrar batería
-            html5QrcodeScanner.clear().catch(err => console.error("Error al cerrar cámara:", err));
+            // Regresar el borde a su estado original al terminar
+            document.querySelector('.container').style.borderColor = 'rgba(245, 158, 11, 0.2)';
+            
+            html5QrcodeScanner.clear().catch(err => console.error(err));
 
-            // 3. API NATIVA DE VOZ: Activamos el altavoz estilo ChatGPT
             if ('speechSynthesis' in window) {
-                // Cancelamos cualquier lectura anterior que se haya quedado colgada
                 window.speechSynthesis.cancel(); 
-                
-                // Creamos el mensaje con las instrucciones encontradas
                 const discurso = new SpeechSynthesisUtterance(textoDecodificado);
-                discurso.lang = 'es-MX'; // Configura el idioma a español latino
-                discurso.rate = 1.0;     // Velocidad normal de lectura
-                
-                // ¡El sistema lee las instrucciones en voz alta!
+                discurso.lang = 'es-MX'; 
+                discurso.rate = 1.0;     
                 window.speechSynthesis.speak(discurso);
-            } else {
-                alert("Tu dispositivo no soporta la lectura de voz automática, pero puedes leer las instrucciones en la caja.");
             }
         }
     </script>
