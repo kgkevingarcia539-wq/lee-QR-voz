@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner Inteligente con Voz</title>
+    <!-- Cargamos el cerebro que procesa los cuadros de la cámara desde internet -->
+    <script src="https://unpkg.com" type="text/javascript"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; text-align: center; margin-top: 40px; }
+        .container { background: #1e293b; padding: 25px; border-radius: 12px; display: inline-block; max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid #334155; }
+        h1 { color: #f59e0b; margin-bottom: 10px; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+        #lector-camara { width: 100%; max-width: 320px; margin: 0 auto; border-radius: 8px; overflow: hidden; background: #0f172a; }
+        .resultado-box { margin-top: 25px; }
+        label { display: block; text-align: left; margin-bottom: 5px; color: #34d399; font-weight: bold; }
+        textarea { width: 90%; height: 120px; padding: 12px; background: #0f172a; color: #34d399; border: 2px solid #475569; border-radius: 6px; font-size: 16px; resize: none; font-family: sans-serif; }
+        button { background: #f59e0b; color: #0f172a; font-weight: bold; border: none; padding: 14px 24px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-size: 16px; width: 95%; transition: 0.2s; }
+        button:hover { background: #fbbf24; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Escáner con Voz 🤖🔊</h1>
+        <p>Apunta a las instrucciones de cualquier código QR para que la web las lea por ti automáticamente.</p>
+        
+        <button onclick="encenderCamara()">📷 Activar Cámara LECTORA</button>
+
+        <!-- Aquí se abrirá el video de tu cámara -->
+        <div id="lector-camara"></div>
+
+        <div class="resultado-box">
+            <label for="textoPegado">Instrucciones extraídas (Pegado automático):</label>
+            <textarea id="textoPegado" placeholder="Esperando que escanees un código QR..." readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        let html5QrcodeScanner;
+
+        function encenderCamara() {
+            // Inicializamos el lector dentro del cuadro de nuestra pantalla
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "lector-camara", 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                false
+            );
+            // Iniciamos la cámara y esperamos a que detecte un QR exitosamente
+            html5QrcodeScanner.render(onScanSuccess);
+        }
+
+        // ESTA FUNCIÓN SE EJECUTA SOLA CUANDO LA CÁMARA VE UN QR
+        function onScanSuccess(textoDecodificado) {
+            // 1. Escribimos las instrucciones automáticamente en la caja verde
+            document.getElementById('textoPegado').value = textoDecodificado;
+            
+            // 2. Apagamos la cámara de inmediato para ahorrar batería
+            html5QrcodeScanner.clear().catch(err => console.error("Error al cerrar cámara:", err));
+
+            // 3. API NATIVA DE VOZ: Activamos el altavoz estilo ChatGPT
+            if ('speechSynthesis' in window) {
+                // Cancelamos cualquier lectura anterior que se haya quedado colgada
+                window.speechSynthesis.cancel(); 
+                
+                // Creamos el mensaje con las instrucciones encontradas
+                const discurso = new SpeechSynthesisUtterance(textoDecodificado);
+                discurso.lang = 'es-MX'; // Configura el idioma a español latino
+                discurso.rate = 1.0;     // Velocidad normal de lectura
+                
+                // ¡El sistema lee las instrucciones en voz alta!
+                window.speechSynthesis.speak(discurso);
+            } else {
+                alert("Tu dispositivo no soporta la lectura de voz automática, pero puedes leer las instrucciones en la caja.");
+            }
+        }
+    </script>
+</body>
+</html>
